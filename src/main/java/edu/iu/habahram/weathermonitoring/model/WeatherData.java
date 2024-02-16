@@ -68,4 +68,14 @@ public class WeatherData implements Subject{
         this.pressure = pressure;
         measurementChanged();
     }
+
+    // New method to subscribe an observer
+    public void subscribeObserver(Observer observer) {
+        registerObserver(observer);
+    }
+
+    // New method to unsubscribe an observer
+    public void unsubscribeObserver(Observer observer) {
+        removeObserver(observer);
+    }
 }

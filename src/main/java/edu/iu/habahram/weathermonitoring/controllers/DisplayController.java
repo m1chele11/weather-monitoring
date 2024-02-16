@@ -4,6 +4,8 @@ import edu.iu.habahram.weathermonitoring.model.CurrentConditionDisplay;
 import edu.iu.habahram.weathermonitoring.model.ForecastDisplay;
 import edu.iu.habahram.weathermonitoring.model.Observer;
 import edu.iu.habahram.weathermonitoring.model.StatisticsDisplay;
+import edu.iu.habahram.weathermonitoring.model.WeatherData;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,23 +13,39 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/displays")
 public class DisplayController {
-    private CurrentConditionDisplay currentConditionDisplay;
 
-    public DisplayController(CurrentConditionDisplay currentConditionDisplay
-                             ) {
+    private CurrentConditionDisplay currentConditionDisplay;
+    private StatisticsDisplay weatherStatsDisplay; // Add WeatherStatsDisplay field
+    private ForecastDisplay forecastDisplay;
+
+    public DisplayController(CurrentConditionDisplay currentConditionDisplay, StatisticsDisplay weatherStatsDisplay, ForecastDisplay forecastDisplay) {
         this.currentConditionDisplay = currentConditionDisplay;
+        this.weatherStatsDisplay = weatherStatsDisplay;
+        this.forecastDisplay = forecastDisplay;
     }
 
     @GetMapping
     public ResponseEntity index() {
-        String html =
-                String.format("<h1>Available screens:</h1>");
+        String html = String.format("<h1>Available screens:</h1>");
         html += "<ul>";
+        
+        // Link for Current Condition Display
         html += "<li>";
-        html += String.format("<a href=/displays/%s>%s</a>", currentConditionDisplay.id(), currentConditionDisplay.name());
+        html += String.format("<a href=\"/displays/%s\">%s</a>", currentConditionDisplay.id(), currentConditionDisplay.name());
         html += "</li>";
 
+        // Link for Weather Stats Display
+        html += "<li>";
+        html += String.format("<a href=\"/displays/%s\">%s</a>", weatherStatsDisplay.id(), weatherStatsDisplay.name());
+        html += "</li>";
+
+         // Link for Forecast Display
+         html += "<li>";
+         html += String.format("<a href=\"/displays/%s\">%s</a>", forecastDisplay.id(), forecastDisplay.name());
+         html += "</li>";
+
         html += "</ul>";
+
         return ResponseEntity
                 .status(HttpStatus.FOUND)
                 .body(html);
@@ -45,6 +63,24 @@ public class DisplayController {
         return ResponseEntity
                 .status(status)
                 .body(html);
+    }
+
+    @GetMapping("/weather-stats")
+    public ResponseEntity weatherStatsDisplay() {
+        String html = weatherStatsDisplay.display();
+        return ResponseEntity.status(HttpStatus.FOUND).body(html);
+    }
+
+    @GetMapping("/currentCondition-display")
+    public ResponseEntity currentConditionDisplay() {
+        String html = currentConditionDisplay.display();
+        return ResponseEntity.status(HttpStatus.FOUND).body(html);
+    }
+
+    @GetMapping("/forecast-display")
+    public ResponseEntity forecastDisplay() {
+        String html = forecastDisplay.display();
+        return ResponseEntity.status(HttpStatus.FOUND).body(html);
     }
 
     @GetMapping("/{id}/subscribe")
